@@ -1,2 +1,2 @@
-# Primary-School-System
+# student-management-system 
 This is group repo
