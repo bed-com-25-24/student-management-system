@@ -3,8 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm'; 
 import{ PDFdocument } from 'pdf-lib'
 import { Report } from './entities/report.entity'; 
-import { Student } from './entities/student.entity';
-import { Grade } from './entities/grade.entity';
 import { CreateReportDto } from './dto/create-report.dto'; 
 import { UpdateReportDto } from './dto/update-report.dto'; 
 
@@ -14,11 +12,6 @@ export class ReportService {
     @InjectRepository(Report)
     private reportRepository: Repository<Report>,
  
-    @InjectRepository(Grade)
-    private gradeRepository :Repository<Grade>,
-
-    @InjectRepository(Student)
-    private studentRepository : Repository<Student>,
 
  ) {}
 
@@ -74,15 +67,4 @@ export class ReportService {
 
  }
 
- //PDF Generation 
- async generatePDF(report : Report ){
-  const pdfDoc = await PDFdocument.create();
-  const page = pdfDoc.addpage();
-
-  page.drawText('Name: $ {report.student.name}');
-  page.drawText('Average: $ {report.average}');
-
-  const pdfBytes = await pdfDoc.save();
-  return pdfBytes
- }
 }
