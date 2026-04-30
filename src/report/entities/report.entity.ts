@@ -5,9 +5,8 @@ export class Report {
     @PrimaryGeneratedColumn()
     id !: number;
 
-    /*@ManyToOne(() => Student)
-    @JoinColumn({name : 'studentId'})
-    student! : Student;*/
+    @Column()
+    studentId! :number;
 
     @Column()
     term !: string;
@@ -19,7 +18,7 @@ export class Report {
     average! : number;
 
     @Column({nullable : true })
-    grade !:string ;
+    grade !:number ;
 
     @Column({nullable : true})
     rank !: number ;

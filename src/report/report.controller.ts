@@ -7,13 +7,13 @@ import { UpdateReportDto } from './dto/update-report.dto';
 export class ReportController {
   constructor(private readonly reportService: ReportService) {}
 
-  @Post('create')
+  @Post('generate')
   async createReport(@Body() dto: CreateReportDto) {
     return this.reportService.createReports(dto.classId, dto.term);
   }
 
   @Get('student/:id')
-  async getStudent(@Param('id') student: number) {
+  async getStudent(@Param('id') student: number): Promise<any> {
     return this.reportService.getStudentReport(student);
   }
 
