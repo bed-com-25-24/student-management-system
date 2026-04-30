@@ -1,29 +1,26 @@
-import { Param } from "@nestjs/common";
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne,JoinColumn } from "typeorm";
-import { Student } from "./student.entity";
-import {Grade } from "./grade.entity";
 
-@Entity()
+@Entity('reports')
 export class Report {
     @PrimaryGeneratedColumn()
-    id : number;
+    id !: number;
 
-    @ManyToOne(() => Student)
+    /*@ManyToOne(() => Student)
     @JoinColumn({name : 'studentId'})
-    student : Student;
+    student! : Student;*/
 
     @Column()
-    term : string;
+    term !: string;
 
     @Column('float')
-    total : number;
+    total!: number;
 
     @Column('float')
-    average : number;
+    average! : number;
 
     @Column({nullable : true })
-    grade :string ;
+    grade !:string ;
 
     @Column({nullable : true})
-    rank : number ;
+    rank !: number ;
 }
