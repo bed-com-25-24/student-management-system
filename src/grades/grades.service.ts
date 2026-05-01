@@ -72,13 +72,35 @@ export class GradesService {
       studentScores[g.studentId].push(g.score);
     });
 
-    const rankings = Object.entries(studentScores).map(([studentId, scores]) => ({
-      studentId: parseInt(studentId),
-      average: scores.reduce((a, b) => a + b, 0) / scores.length,
-      grade: this.mapBoundary(scores.reduce((a, b) => a + b, 0) / scores.length),
-    }));
+    const rankings = Object.entries(studentScores).map(([studentId, scores]) => {
+      const average = scores.reduce((a, b) => a + b, 0) / scores.length;
+      return {
+        studentId: Number(studentId),
+        average,
+        grade: this.mapBoundary(average),
+      };
+    });
 
     return rankings.sort((a, b) => b.average - a.average);
+  }
+
+  async computeSubjectAverages(classId: number, term: string): Promise<any[]> {
+    const grades = await this.findAll(classId, term);
+
+    if (!grades.length) return [];
+
+    const subjectScores: Record<number, number[]> = {};
+    for (const g of grades) {
+      if (!subjectScores[g.subjectId]) {
+        subjectScores[g.subjectId] = [];
+      }
+      subjectScores[g.subjectId].push(Number(g.score));
+    }
+
+    return Object.entries(subjectScores).map(([subjectId, scores]) => {
+      const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+      return { subjectId: Number(subjectId), average: avg };
+    });
   }
 
   private mapBoundary(score: number): string {
