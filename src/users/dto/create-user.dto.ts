@@ -1,29 +1,31 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString} from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateUserDto {
-    @IsNumber()
-    @IsNotEmpty()
-    id! :number ;
-
     @IsString()
     @IsOptional()
     firstName?: string;
 
     @IsString()
     @IsOptional()
-    LastName? : string;
+    LastName?: string;
 
     @IsString()
     @IsOptional()
-    email? :string;
+    email?: string;
 
     @IsString()
     @IsOptional()
-    subject? : string;
+    subject?: string;
 
     @IsNumber()
     @IsOptional()
-    class? : number
+    class?: number;
 
+    @IsString()
+    @IsNotEmpty()
+    password!: string;
 
+    @IsString()
+    @IsOptional()
+    role?: string;
 }
