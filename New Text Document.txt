@@ -1,0 +1,76 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+// Function to reverse a string
+string Reverse(string str) {
+    string reversed = "";
+    for (int i = str.length() - 1; i >= 0; i--) {
+        reversed += str[i];
+    }
+    return reversed;
+}
+
+// Function to capitalize second letter of each word
+string capitalizeSecondLetter(string str) {
+    stringstream ss(str);
+    string word, result = "";
+
+    while (ss >> word) {
+        if (word.length() >= 2) {
+            word[1] = toupper(word[1]);
+        }
+        result += word + " ";
+    }
+
+    return result;
+}
+
+int main() {
+    ifstream file("input.txt");
+    string fileData;
+
+    // (ii) Read file content into fileData
+    if (file.is_open()) {
+        getline(file, fileData);
+        file.close();
+    } else {
+        cout << "Error opening file!" << endl;
+        return 1;
+    }
+
+    cout << "Original Text: " << fileData << endl;
+
+    // (iii) Count vowels
+    int vowelCount = 0;
+    for (char c : fileData) {
+        char lower = tolower(c);
+        if (lower == 'a' || lower == 'e' || lower == 'i' || lower == 'o' || lower == 'u') {
+            vowelCount++;
+        }
+    }
+    cout << "Number of vowels: " << vowelCount << endl;
+
+    // (iv) Count words
+    stringstream ss(fileData);
+    string word;
+    int wordCount = 0;
+
+    while (ss >> word) {
+        wordCount++;
+    }
+    cout << "Number of words: " << wordCount << endl;
+
+    // (v) Reverse text
+    string reversedText = Reverse(fileData);
+    cout << "Reversed Text: " << reversedText << endl;
+
+    // (vi) Capitalize second letter of each word
+    string modifiedText = capitalizeSecondLetter(fileData);
+    cout << "Second letter capitalized: " << modifiedText << endl;
+
+    return 0;
+}
