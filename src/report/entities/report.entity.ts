@@ -1,25 +1,35 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne,JoinColumn } from "typeorm";
+// entities/report.entity.ts
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+
 
 @Entity('reports')
 export class Report {
-    @PrimaryGeneratedColumn()
-    id !: number;
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-    @Column()
-    studentId! :number;
+  @Column()
+  total!: number;
 
-    @Column()
-    term !: string;
+  @Column()
+  term!: string;
 
-    @Column('float')
-    total!: number;
+  @Column({ type: 'decimal', precision: 5, scale: 2 })
+  average!: number;
 
-    @Column('float')
-    average! : number;
+  @Column()
+  studentId!: number;
 
-    @Column({nullable : true })
-    grade !:number ;
+  @Column({ type: 'int', nullable: true })
+  classId?: number;
 
-    @Column({nullable : true})
-    rank !: number ;
+  @Column({ type: 'decimal', precision: 5, scale: 2 })
+  grade!: number;
+
+  @Column()
+  rank!: number;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  generatedAt!: Date;
+
+
 }
