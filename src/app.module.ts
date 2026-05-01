@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { GradesModule } from './grades/grades.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+  imports:[
+  ConfigModule.forRoot({isGlobal:true, envFilePath: '.env'}),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -24,5 +26,7 @@ import { User } from './users/entities/user.entity';
     }),
     UsersModule,
   ],
-})
-export class AppModule { }
+  controllers:[AppController],
+  providers:[AppService],
+  })
+export class AppModule {}
