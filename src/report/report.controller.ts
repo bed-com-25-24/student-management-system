@@ -1,32 +1,42 @@
-import { Body, Controller, Get, Param, Post, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, ParseIntPipe } from '@nestjs/common';
 import { ReportService } from './report.service';
 import { CreateReportDto } from './dto/create-report.dto';
+import { GenerateBatchReportDto } from './dto/generate-report.dto';
 
-@Controller('reports')
+@Controller('api/v1/reports')
 export class ReportController {
-  constructor(private readonly reportService: ReportService) {}
+  constructor(private readonly reportService: ReportService) { }
 
-  // Endpoint 1: POST /reports/generate
+  // Endpoint 1: POST /api/v1/reports/generate
   @Post('generate')
-  async generateReport(@Body() createReportDto: CreateReportDto) {
-    return this.reportService.generateReport(createReportDto);
+  async generateReport(@Body() generateBatchDto: GenerateBatchReportDto) {
+    return this.reportService.generateReport(generateBatchDto);
   }
 
-  // Endpoint 2: GET /reports/student/:id
+  // Endpoint 2: GET /api/v1/reports/student/:id
   @Get('student/:id')
-  async getStudentReport(@Param('id', ParseIntPipe) studentId: number) {
-    return this.reportService.getStudentReport(studentId);
+  async getStudentReport(
+    @Param('id', ParseIntPipe) studentId: number,
+    @Query('term') term: string
+  ) {
+    return this.reportService.getStudentReport(studentId, term);
   }
 
-  // Endpoint 3: GET /reports/class/:classId
-  @Get('class/:classId')
-  async getClassReport(@Param('classId', ParseIntPipe) classId: number) {
-    return this.reportService.getClassReport(classId);
+  // Endpoint 3: GET /api/v1/reports/class/:class
+  @Get('class/:class')
+  async getClassReport(
+    @Param('class', ParseIntPipe) classId: number,
+    @Query('term') term: string
+  ) {
+    return this.reportService.getClassReport(classId, term);
   }
 
-  // Endpoint 4: GET /reports/class/:classId/overview
-  @Get('class/:classId/overview')
-  async getClassOverview(@Param('classId', ParseIntPipe) classId: number) {
-    return this.reportService.getClassOverview(classId);
+  // Endpoint 4: GET /api/v1/reports/class/:class/overview
+  @Get('class/:class/overview')
+  async getClassOverview(
+    @Param('class', ParseIntPipe) classId: number,
+    @Query('term') term: string
+  ) {
+    return this.reportService.getClassOverview(classId, term);
   }
 }

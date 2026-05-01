@@ -4,28 +4,32 @@ import { Repository } from 'typeorm';
 import { Report } from './entities/report.entity';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
+import { GenerateBatchReportDto } from './dto/generate-report.dto';
 
 @Injectable()
 export class ReportService {
   constructor(
     @InjectRepository(Report)
     private reportRepository: Repository<Report>,
-  ) {}
+  ) { }
 
-  // Endpoint 1: POST /reports/generate
-  async generateReport(createReportDto: CreateReportDto) {
-    // Create a new report from the DTO
-    const report = this.reportRepository.create({
-      total: createReportDto.total,
-      term: createReportDto.term,
-      average: createReportDto.average,
-      studentId: createReportDto.studentId,
-      grade: createReportDto.grade,
-      rank: createReportDto.rank,
-      generatedAt: createReportDto.generatedAt || new Date(),
+  // Endpoint 1: POST /api/v1/reports/generate
+  async generateReport(generateBatchDto: GenerateBatchReportDto) {
+    // Mock generating end-of-term reports for all students in the class
+    const dummyReports = [1, 2, 3].map((studentId) => {
+      return this.reportRepository.create({
+        total: Math.floor(Math.random() * 100),
+        term: generateBatchDto.term,
+        classId: generateBatchDto.classId,
+        average: Math.floor(Math.random() * 100),
+        studentId: studentId,
+        grade: Math.floor(Math.random() * 100),
+        rank: studentId,
+        generatedAt: new Date(),
+      } as any);
     });
-    
-    return this.reportRepository.save(report);
+
+    return this.reportRepository.save(dummyReports as any);
   }
 
   // Original create method (can be kept or removed)
@@ -64,31 +68,34 @@ export class ReportService {
     return this.reportRepository.remove(report);
   }
 
-  // Endpoint 2: GET /reports/student/:id
-  async getStudentReport(studentId: number) {
-    const reports = await this.reportRepository.find({ where: { studentId } });
-    
+  // Endpoint 2: GET /api/v1/reports/student/:id
+  async getStudentReport(studentId: number, term?: string) {
+    const whereCondition = term ? { studentId, term } : { studentId };
+    const reports = await this.reportRepository.find({ where: whereCondition });
+
     if (!reports || reports.length === 0) {
       throw new NotFoundException(`No reports found for student with id ${studentId}`);
     }
-    
+
     return reports;
   }
 
-  // Endpoint 3: GET /reports/class/:classId
-  async getClassReport(classId: number) {
-    const reports = await this.reportRepository.find({ where: { classId } });
-    
+  // Endpoint 3: GET /api/v1/reports/class/:class
+  async getClassReport(classId: number, term?: string) {
+    const whereCondition = term ? { classId, term } : { classId };
+    const reports = await this.reportRepository.find({ where: whereCondition });
+
     if (!reports || reports.length === 0) {
       throw new NotFoundException(`No reports found for class id ${classId}`);
     }
-    
+
     return reports;
   }
 
-  // Endpoint 4: GET /reports/class/:classId/overview
-  async getClassOverview(classId: number) {
-    const reports = await this.reportRepository.find({ where: { classId } });
+  // Endpoint 4: GET /api/v1/reports/class/:class/overview
+  async getClassOverview(classId: number, term?: string) {
+    const whereCondition = term ? { classId, term } : { classId };
+    const reports = await this.reportRepository.find({ where: whereCondition });
 
     if (!reports || reports.length === 0) {
       throw new NotFoundException(`No reports found for class id ${classId}`);
