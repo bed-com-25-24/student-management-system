@@ -1,8 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query, ParseIntPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ReportService } from './report.service';
 import { CreateReportDto } from './dto/create-report.dto';
 import { GenerateBatchReportDto } from './dto/generate-report.dto';
+import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles/roles.guard';
+import { Roles } from '../auth/roles/roles.decorator';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('api/v1/reports')
 export class ReportController {
   constructor(private readonly reportService: ReportService) { }

@@ -37,7 +37,12 @@ export class UsersService {
         if (!user) {
             throw new Error('User not found');
         }
-        await this.usersRepository.update(id, updateUserDto);
+        const dataToUpdate: Partial<UpdateUserDto> = { ...updateUserDto };
+        if (dataToUpdate.password) {
+            const saltOrRounds = 10;
+            dataToUpdate.password = await bcrypt.hash(dataToUpdate.password, saltOrRounds);
+        }
+        await this.usersRepository.update(id, dataToUpdate);
         return this.usersRepository.findOne({ where: { id } }) as Promise<User>;
     }
 

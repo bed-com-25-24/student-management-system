@@ -1,14 +1,18 @@
-import { BadRequestException, Controller, Get, Post, Patch, Param, Body, Query } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { GradesService } from './grades.service';
 import { CreateGradeDto } from './dto/CreateGradeDto';
 import { UpdateGradeDto } from './dto/UpdateGradeDto';
 import { PickType } from '@nestjs/mapped-types';
+import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles/roles.guard';
+import { Roles } from '../auth/roles/roles.decorator';
 
-class CreateGradeByStudentSubjectDto extends PickType(CreateGradeDto, ['classId', 'score'] as const) {}
+class CreateGradeByStudentSubjectDto extends PickType(CreateGradeDto, ['classId', 'score'] as const) { }
 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('grades')
 export class GradesController {
-  constructor(private readonly gradesService: GradesService) {}
+  constructor(private readonly gradesService: GradesService) { }
 
   // Teacher enters score per student per subject per term
   @Post()
