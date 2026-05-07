@@ -1,26 +1,53 @@
-import { BadRequestException, Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Put,
+  Body,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { GradesService } from './grades.service';
 import { CreateGradeDto } from './dto/CreateGradeDto';
 import { UpdateGradeDto } from './dto/UpdateGradeDto';
-import { PickType } from '@nestjs/mapped-types';
 import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { RolesGuard } from '../auth/roles/roles.guard';
 import { Roles } from '../auth/roles/roles.decorator';
 
-class CreateGradeByStudentSubjectDto extends PickType(CreateGradeDto, ['classId', 'score'] as const) { }
-
+@ApiTags('Grades')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('grades')
 export class GradesController {
   constructor(private readonly gradesService: GradesService) { }
 
-  // Teacher enters score per student per subject per term
+  // POST /api/v1/grades — Enter grades for a student per subject
   @Post()
   create(@Body() createGradeDto: CreateGradeDto) {
     return this.gradesService.create(createGradeDto);
   }
 
-  // Averages per subject in a class/term
+  // GET /api/v1/grades?class=&term= — Display entered grades for cross-check
+  @Get()
+  findAll(@Query('class') classId?: string, @Query('term') term?: string) {
+    return this.gradesService.findAll(classId ? parseInt(classId, 10) : undefined, term);
+  }
+
+  // GET /api/v1/grades/class/:classId/overview — Class performance overview
+  @Get('class/:classId/overview')
+  getClassOverview(
+    @Param('classId') classId: string,
+    @Query('term') term?: string,
+  ) {
+    return this.gradesService.computeClassRanking(parseInt(classId, 10), term || '');
+  }
+
+  // GET /api/v1/grades/averages — Averages per subject in a class/term
   @Get('averages')
   computeAverages(
     @Query('class') classId: string,
@@ -29,13 +56,13 @@ export class GradesController {
     return this.gradesService.computeSubjectAverages(parseInt(classId, 10), term);
   }
 
-  // Class ranking and grade boundary mapping
+  // GET /api/v1/grades/ranking
   @Get('ranking')
   computeRanking(@Query('class') classId: string, @Query('term') term: string) {
     return this.gradesService.computeClassRanking(parseInt(classId, 10), term);
   }
 
-  // Final grade calculation per student per term
+  // GET /api/v1/grades/final/:studentId/:term
   @Get('final/:studentId/:term')
   computeFinal(
     @Param('studentId') studentId: string,
@@ -44,7 +71,7 @@ export class GradesController {
     return this.gradesService.computeFinalGrade(+studentId, term);
   }
 
-  // Get grade of a specific student in a subject
+  // GET /api/v1/grades/student/:studentId/subject/:subjectId
   @Get('student/:studentId/subject/:subjectId')
   findByStudentAndSubject(
     @Param('studentId') studentId: string,
@@ -54,27 +81,26 @@ export class GradesController {
     return this.gradesService.findByStudentAndSubject(+studentId, +subjectId, term);
   }
 
-  // Create a grade record for a specific student and subject
+  // POST /api/v1/grades/student/:studentId/subject/:subjectId
   @Post('student/:studentId/subject/:subjectId')
   createByStudentAndSubject(
     @Param('studentId') studentId: string,
     @Param('subjectId') subjectId: string,
     @Query('term') term: string,
-    @Body() createGradeDto: CreateGradeByStudentSubjectDto,
+    @Body() dto: Partial<CreateGradeDto>,
   ) {
     if (!term) {
       throw new BadRequestException('The term query parameter is required');
     }
-
     return this.gradesService.create({
-      ...createGradeDto,
+      ...dto,
       studentId: +studentId,
       subjectId: +subjectId,
       term: +term,
     } as CreateGradeDto);
   }
 
-  // Update grade of a specific student in a subject
+  // PATCH /api/v1/grades/student/:studentId/subject/:subjectId
   @Patch('student/:studentId/subject/:subjectId')
   updateByStudentAndSubject(
     @Param('studentId') studentId: string,
@@ -85,22 +111,23 @@ export class GradesController {
     return this.gradesService.updateByStudentAndSubject(+studentId, +subjectId, updateGradeDto, term);
   }
 
-  // Overview endpoint: display entered grades for cross-check
-  @Get()
-  findAll(@Query('class') classId?: string, @Query('term') term?: string) {
-    return this.gradesService.findAll(classId ? parseInt(classId, 10) : undefined, term);
-  }
-
-  // Get single grade entry
+  // GET /api/v1/grades/:id — Get single grade entry
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.gradesService.findOne(+id);
   }
 
-  // Allow correction; log audit trail
+  // PUT /api/v1/grades/:id — Update or correct a grade entry
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateGradeDto: UpdateGradeDto) {
     return this.gradesService.update(+id, updateGradeDto);
   }
+
+  // DELETE /api/v1/grades/:id — Delete a grade entry
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.gradesService.remove(+id);
+  }
 }
+
 

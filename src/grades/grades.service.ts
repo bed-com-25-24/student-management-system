@@ -10,7 +10,7 @@ export class GradesService {
   constructor(
     @InjectRepository(Grade)
     private readonly gradesRepository: Repository<Grade>,
-  ) {}
+  ) { }
 
   async create(createGradeDto: CreateGradeDto): Promise<Grade> {
     const grade = this.gradesRepository.create(createGradeDto);
@@ -38,12 +38,19 @@ export class GradesService {
 
     return await this.gradesRepository.save(updated);
   }
+
+  async remove(id: number): Promise<{ message: string }> {
+    await this.findOne(id); // ensures 404 if not found
+    await this.gradesRepository.delete(id);
+    return { message: `Grade ${id} deleted successfully` };
+  }
+
   async findByStudentAndSubject(studentId: number, subjectId: number, term?: string): Promise<Grade> {
     const whereCondition: any = { studentId, subjectId };
     if (term) {
       whereCondition.term = term;
     }
-    
+
     const grade = await this.gradesRepository.findOne({
       where: whereCondition,
     });
@@ -61,8 +68,8 @@ export class GradesService {
 
 
   async computeFinalGrade(studentId: number, term: string): Promise<number> {
-    const grades = await this.gradesRepository.find({ 
-      where: { studentId, term: Number(term) } 
+    const grades = await this.gradesRepository.find({
+      where: { studentId, term: Number(term) }
     });
     if (!grades.length) return 0;
 

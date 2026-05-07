@@ -1,21 +1,25 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { Class } from './class.entity';
-import { User } from '../../users/entities/user.entity';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity()
+@Entity('student')
 export class Student {
   @PrimaryGeneratedColumn()
+  @ApiProperty()
   id!: number;
 
   @Column()
+  @ApiProperty({ example: 'Maxwell Simbeye' })
   fullName!: string;
 
-  @Column()
-  dateOfBirth!: Date;
+  @Column({ nullable: true, type: 'date' })
+  @ApiPropertyOptional({ example: '2000-01-15' })
+  dateOfBirth?: Date;
 
-  @Column()
-  classId!: number;// changed from class to this 
+  @Column({ nullable: true })
+  @ApiPropertyOptional({ example: 1 })
+  classId?: number;
 
-  @ManyToOne(() => User)
-  createdBy!: User;
+  @Column({ nullable: true })
+  @ApiPropertyOptional({ description: 'ID of the user (teacher) who created this record' })
+  createdById?: number;
 }

@@ -28,11 +28,11 @@ export class ReportService {
     private gradeRepository: Repository<Grade>,
     @InjectRepository(Class)
     private classRepository: Repository<Class>,
-  ) {}
+  ) { }
 
   async generateFromData(classId: number, term: string) {
     const termNumber = parseInt(term);
-    
+
     const students = await this.studentRepository.find({
       where: { classId: classId },
       relations: ['class']
@@ -53,9 +53,9 @@ export class ReportService {
       });
 
       if (existingReport) {
-        generatedReports.push({ 
-          studentId: student.id, 
-          status: 'skipped', 
+        generatedReports.push({
+          studentId: student.id,
+          status: 'skipped',
           message: 'Report already exists'
         });
         continue;
@@ -69,9 +69,9 @@ export class ReportService {
       });
 
       if (grades.length === 0) {
-        generatedReports.push({ 
-          studentId: student.id, 
-          status: 'skipped', 
+        generatedReports.push({
+          studentId: student.id,
+          status: 'skipped',
           message: 'No grades found'
         });
         continue;
@@ -93,7 +93,7 @@ export class ReportService {
 
       const report = this.reportRepository.create(createReportDto);
       const saved = await this.reportRepository.save(report);
-      
+
       generatedReports.push({
         studentId: student.id,
         status: 'generated',
@@ -159,7 +159,7 @@ export class ReportService {
 
   async generateSingleStudentReport(studentId: number, term: string) {
     const termNumber = parseInt(term);
-    
+
     const student = await this.studentRepository.findOne({
       where: { id: studentId }
     });
@@ -209,7 +209,9 @@ export class ReportService {
     const report = this.reportRepository.create(createReportDto);
     const saved = await this.reportRepository.save(report);
 
-    await this.updateClassRanks(student.classId, termNumber);
+    if (student.classId) {
+      await this.updateClassRanks(student.classId, termNumber);
+    }
 
     return saved;
   }
@@ -221,7 +223,7 @@ export class ReportService {
         term: createReportDto.term
       }
     });
-    
+
     if (existingReport) {
       throw new ConflictException(
         `A report already exists for student ${createReportDto.studentId} in term "${createReportDto.term}"`
@@ -234,7 +236,7 @@ export class ReportService {
 
   async update(id: number, updateReportDto: UpdateReportDto) {
     const report = await this.findOne(id);
-    
+
     if (updateReportDto.term && updateReportDto.term !== report.term) {
       const conflictReport = await this.reportRepository.findOne({
         where: {
@@ -242,14 +244,14 @@ export class ReportService {
           term: updateReportDto.term
         }
       });
-      
+
       if (conflictReport && conflictReport.id !== id) {
         throw new ConflictException(
           `Cannot change term: A report already exists for student ${report.studentId} in term "${updateReportDto.term}"`
         );
       }
     }
-    
+
     Object.assign(report, updateReportDto);
     return await this.reportRepository.save(report);
   }
@@ -259,29 +261,29 @@ export class ReportService {
       where: { studentId },
       order: { generatedAt: 'DESC' }
     });
-    
+
     if (reports.length === 0) {
       throw new NotFoundException(`No reports found for student ID ${studentId}`);
     }
-    
+
     return reports;
   }
 
   async findByClass(className: string) {
     const classId = parseInt(className);
-    
+
     if (!isNaN(classId)) {
       const reports = await this.reportRepository.find({
         where: { classId },
         order: { rank: 'ASC' }
       });
-      
+
       if (reports.length === 0) {
         throw new NotFoundException(`No reports found for class ID ${classId}`);
       }
       return reports;
     }
-    
+
     const classEntity = await this.classRepository.findOne({
       where: { name: className }
     });
@@ -294,18 +296,18 @@ export class ReportService {
       where: { classId: classEntity.id },
       order: { rank: 'ASC' }
     });
-    
+
     if (reports.length === 0) {
       throw new NotFoundException(`No reports found for class ${className}`);
     }
-    
+
     return reports;
   }
 
   async getClassOverview(className: string) {
     let reports: Report[] = [];
     const classId = parseInt(className);
-    
+
     if (!isNaN(classId)) {
       reports = await this.reportRepository.find({
         where: { classId },
@@ -315,25 +317,25 @@ export class ReportService {
       const classEntity = await this.classRepository.findOne({
         where: { name: className }
       });
-      
+
       if (!classEntity) {
         throw new NotFoundException(`Class ${className} not found`);
       }
-      
+
       reports = await this.reportRepository.find({
         where: { classId: classEntity.id },
         order: { rank: 'ASC' }
       });
     }
-    
+
     if (reports.length === 0) {
       throw new NotFoundException(`No reports found for class ${className}`);
     }
-    
+
     const totalStudents = reports.length;
     const totalAverage = reports.reduce((sum, report) => sum + report.average, 0);
     const totalGrade = reports.reduce((sum, report) => sum + report.grade, 0);
-    
+
     const gradeDistribution = {
       'A+': reports.filter(r => r.grade >= 95).length,
       'A': reports.filter(r => r.grade >= 90 && r.grade < 95).length,
@@ -344,7 +346,7 @@ export class ReportService {
       'D': reports.filter(r => r.grade >= 60 && r.grade < 70).length,
       'F': reports.filter(r => r.grade < 60).length,
     };
-    
+
     return {
       className: className,
       term: reports[0]?.term || 'N/A',
@@ -381,4 +383,3 @@ export class ReportService {
     return await this.reportRepository.remove(report);
   }
 }
-      

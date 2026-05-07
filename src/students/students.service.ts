@@ -8,23 +8,23 @@ export class StudentService {
   constructor(
     @InjectRepository(Student)
     private studentRepo: Repository<Student>,
-  ) {}
+  ) { }
 
   async createStudent(dto: any) {
     const student = this.studentRepo.create(dto);
     return await this.studentRepo.save(student);
   }
 
-  async findAllStudents() {
-    return this.studentRepo.find({ relations: ['class'] });
+  async findAllStudents(query?: { classId?: number }) {
+    const classId = query?.classId;
+    if (classId) {
+      return this.studentRepo.find({ where: { classId: Number(classId) } });
+    }
+    return this.studentRepo.find();
   }
 
   async findStudentById(id: number) {
-    const student = await this.studentRepo.findOne({
-      where: { id },
-      relations: ['class'],
-    });
-
+    const student = await this.studentRepo.findOne({ where: { id } });
     if (!student) throw new NotFoundException('Student not found');
     return student;
   }
@@ -37,5 +37,13 @@ export class StudentService {
   async deleteStudent(id: number) {
     await this.studentRepo.delete(id);
     return { message: 'Student deleted' };
+  }
+
+  async getStudentGrades(studentId: number): Promise<any[]> {
+    // Oracle uses positional binding (:1), not named binding
+    return this.studentRepo.query(
+      `SELECT * FROM "grades" WHERE "studentId" = :1`,
+      [studentId],
+    );
   }
 }
