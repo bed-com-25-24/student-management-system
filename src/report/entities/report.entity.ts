@@ -1,8 +1,11 @@
 // entities/report.entity.ts
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, Unique } from 'typeorm';
+import { Student } from 'src/students/entities/student.entity';
+import { Grade } from 'src/grades/entities/Grade.entity';
 
 
 @Entity('reports')
+@Unique(['studentId', 'term'])
 export class Report {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -10,8 +13,8 @@ export class Report {
   @Column({ type: 'int' })
   total!: number;
 
-  @Column({ type: 'varchar', length: 50 })
-  term!: string;
+  @Column()
+  term!: number;
 
   @Column({ type: 'decimal', precision: 5, scale: 2 })
   average!: number;

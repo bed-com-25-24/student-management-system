@@ -9,7 +9,7 @@ export class Grade{
     studentId! :number;
     @Column()
     subjectId! :number;
-    @Column({ type: 'number',length :20})
+    @Column()
     term!:Number;
     @Column({ type: 'decimal', precision: 5, scale: 2 })
     score! :number;

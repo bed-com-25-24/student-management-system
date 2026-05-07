@@ -13,8 +13,8 @@ export class Student {
   @Column()
   dateOfBirth!: Date;
 
-  @ManyToOne(() => Class)
-  class!: Class;
+  @Column()
+  classId!: number;// changed from class to this 
 
   @ManyToOne(() => User)
   createdBy!: User;

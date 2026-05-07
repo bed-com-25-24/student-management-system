@@ -7,43 +7,37 @@ export class CreateReportDto {
   @IsNumber()
   @IsNotEmpty()
   @Min(0)
-  @ApiProperty()
   total!: number;
 
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
   @ApiProperty()
-  term!: string;
+  term!: number;
 
   @IsNumber()
   @IsNotEmpty()
   @Min(0)
   @Max(100)
-  @ApiProperty()
   average!: number;
 
   @IsNumber()
   @IsNotEmpty()
-  @ApiProperty()
   studentId!: number;
 
   @IsNumber()
   @IsNotEmpty()
   @Min(0)
   @Max(100)
-  @ApiProperty()
   grade!: number;
 
   @IsNumber()
   @IsNotEmpty()
   @Min(1)
-  @ApiProperty()
   rank!: number;
 
   @IsOptional()
    @Type(() => Date)
   @IsDate()
- @ApiProperty({ required: false }) 
   generatedAt?: Date;
 
   @IsOptional()
