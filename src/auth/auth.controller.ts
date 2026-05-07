@@ -12,6 +12,7 @@ import {
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { AuthLoginDto } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -23,7 +24,7 @@ export class AuthController {
     }
 
     @Post('login')
-    async login(@Body() body: { email?: string; password: string }) {
+    async login(@Body() body: AuthLoginDto) {
         const identifier = body.email || '';
         const result = await this.authService.validateUser(identifier, body.password);
         if (result?.error === 'USER_NOT_FOUND') {
