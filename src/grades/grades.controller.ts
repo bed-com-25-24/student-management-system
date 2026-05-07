@@ -70,7 +70,7 @@ export class GradesController {
       ...createGradeDto,
       studentId: +studentId,
       subjectId: +subjectId,
-      term,
+      term: +term,
     } as CreateGradeDto);
   }
 

@@ -8,5 +8,5 @@ export class AuthLoginDto {
 
     @IsNotEmpty()
     @ApiProperty()
-    password: string;
+    password!: string;
 };

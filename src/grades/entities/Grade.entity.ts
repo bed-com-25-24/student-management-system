@@ -9,8 +9,8 @@ export class Grade{
     studentId! :number;
     @Column()
     subjectId! :number;
-    @Column({ type: 'varchar',length :20})
-    term!:string;
+    @Column({ type: 'number',length :20})
+    term!:Number;
     @Column({ type: 'decimal', precision: 5, scale: 2 })
     score! :number;
     @CreateDateColumn()
