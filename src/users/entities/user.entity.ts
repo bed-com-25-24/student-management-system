@@ -5,19 +5,19 @@ export class User {
     @PrimaryGeneratedColumn()
     id?: number;
 
-    @Column()
+    @Column({ nullable: true })
     firstName?: string;
 
-    @Column()
+    @Column({ nullable: true })
     LastName?: string;
 
-    @Column({ unique: true })
+    @Column({ unique: true, nullable: true })
     email?: string;
 
     @Column({ nullable: true })
     password?: string;
 
-    @Column({ default: 'user' })
+    @Column({ default: 'user', nullable: true })
     role?: string;
 
     @Column({ nullable: true })

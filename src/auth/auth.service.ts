@@ -24,14 +24,22 @@ export class AuthService {
 
     async validateUser(email: string, pass: string): Promise<any> {
         const user = await this.usersService.findByEmail(email);
-        if (user && user.password) {
-            const isMatch = await bcrypt.compare(pass, user.password);
-            if (isMatch) {
-                const { password, ...result } = user;
-                return result;
-            }
+        if (!user) {
+            return { error: 'USER_NOT_FOUND' };
         }
-        return null;
+        if (!user.password) {
+            return { error: 'NO_PASSWORD' };
+        }
+        const isMatch = await bcrypt.compare(pass, user.password);
+        if (!isMatch) {
+            return { error: 'WRONG_PASSWORD' };
+        }
+        const { password, ...result } = user;
+        return result;
+    }
+
+    async register(dto: { firstName: string; LastName: string; email: string; password: string; role?: string }) {
+        return this.usersService.create(dto as any);
     }
 
     async login(user: any) {

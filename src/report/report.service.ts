@@ -20,7 +20,7 @@ export class ReportService {
       return this.reportRepository.create({
         total: Math.floor(Math.random() * 100),
         term: generateBatchDto.term,
-        classId: generateBatchDto.classId,
+        classId: generateBatchDto.class,
         average: Math.floor(Math.random() * 100),
         studentId: studentId,
         grade: Math.floor(Math.random() * 100),

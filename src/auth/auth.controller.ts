@@ -17,14 +17,25 @@ import { CurrentUser } from './decorators/current-user.decorator';
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
 
+    @Post('register')
+    async register(@Body() body: { firstName: string; LastName: string; email: string; password: string; role?: string }) {
+        return this.authService.register(body);
+    }
+
     @Post('login')
     async login(@Body() body: { email?: string; password: string }) {
         const identifier = body.email || '';
-        const user = await this.authService.validateUser(identifier, body.password);
-        if (!user) {
-            throw new UnauthorizedException('Invalid credentials');
+        const result = await this.authService.validateUser(identifier, body.password);
+        if (result?.error === 'USER_NOT_FOUND') {
+            throw new UnauthorizedException('No account found with that email address');
         }
-        return this.authService.login(user);
+        if (result?.error === 'NO_PASSWORD') {
+            throw new UnauthorizedException('This account has no password set. Please use the reset endpoint to set one.');
+        }
+        if (result?.error === 'WRONG_PASSWORD') {
+            throw new UnauthorizedException('Incorrect password');
+        }
+        return this.authService.login(result);
     }
 
     @Post('logout')

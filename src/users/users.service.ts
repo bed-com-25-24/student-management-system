@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -14,8 +14,22 @@ export class UsersService {
     ) { }
 
     async create(createUserDto: CreateUserDto) {
+        const existingUser = await this.findByEmail(createUserDto.email);
         const saltOrRounds = 10;
         const hashedPassword = await bcrypt.hash(createUserDto.password, saltOrRounds);
+
+        if (existingUser) {
+            if (!existingUser.password) {
+                // Claim uninitialized account
+                existingUser.password = hashedPassword;
+                existingUser.firstName = createUserDto.firstName;
+                existingUser.LastName = createUserDto.LastName;
+                if (createUserDto.role) existingUser.role = createUserDto.role;
+                return await this.usersRepository.save(existingUser);
+            }
+            throw new ConflictException('Email already in use');
+        }
+
         const user = this.usersRepository.create({ ...createUserDto, password: hashedPassword });
         return await this.usersRepository.save(user);
     }

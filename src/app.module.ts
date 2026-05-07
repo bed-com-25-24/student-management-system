@@ -24,7 +24,7 @@ import { Report } from './report/entities/report.entity';
                 password: config.get('DB_PASSWORD'),
                 serviceName: config.get('DB_SERVICE_NAME'),
                 synchronize: config.get('DB_SYNCHRONIZE') === 'true',
-                entities: [User, Grade, Report],
+                autoLoadEntities: true,
                 logging: true,
             }),
         }),
