@@ -47,78 +47,10 @@ export class GradesController {
     return this.gradesService.computeClassRanking(parseInt(classId, 10), term || '');
   }
 
-  // GET /api/v1/grades/averages — Averages per subject in a class/term
-  @Get('averages')
-  computeAverages(
-    @Query('class') classId: string,
-    @Query('term') term: string,
-  ) {
-    return this.gradesService.computeSubjectAverages(parseInt(classId, 10), term);
-  }
 
-  // GET /api/v1/grades/ranking
-  @Get('ranking')
-  computeRanking(@Query('class') classId: string, @Query('term') term: string) {
-    return this.gradesService.computeClassRanking(parseInt(classId, 10), term);
-  }
-
-  // GET /api/v1/grades/final/:studentId/:term
-  @Get('final/:studentId/:term')
-  computeFinal(
-    @Param('studentId') studentId: string,
-    @Param('term') term: string,
-  ) {
-    return this.gradesService.computeFinalGrade(+studentId, term);
-  }
-
-  // GET /api/v1/grades/student/:studentId/subject/:subjectId
-  @Get('student/:studentId/subject/:subjectId')
-  findByStudentAndSubject(
-    @Param('studentId') studentId: string,
-    @Param('subjectId') subjectId: string,
-    @Query('term') term?: string,
-  ) {
-    return this.gradesService.findByStudentAndSubject(+studentId, +subjectId, term);
-  }
-
-  // POST /api/v1/grades/student/:studentId/subject/:subjectId
-  @Post('student/:studentId/subject/:subjectId')
-  createByStudentAndSubject(
-    @Param('studentId') studentId: string,
-    @Param('subjectId') subjectId: string,
-    @Query('term') term: string,
-    @Body() dto: Partial<CreateGradeDto>,
-  ) {
-    if (!term) {
-      throw new BadRequestException('The term query parameter is required');
-    }
-    return this.gradesService.create({
-      ...dto,
-      studentId: +studentId,
-      subjectId: +subjectId,
-      term: +term,
-    } as CreateGradeDto);
-  }
-
-  // PATCH /api/v1/grades/student/:studentId/subject/:subjectId
-  @Patch('student/:studentId/subject/:subjectId')
-  updateByStudentAndSubject(
-    @Param('studentId') studentId: string,
-    @Param('subjectId') subjectId: string,
-    @Body() updateGradeDto: UpdateGradeDto,
-    @Query('term') term?: string,
-  ) {
-    return this.gradesService.updateByStudentAndSubject(+studentId, +subjectId, updateGradeDto, term);
-  }
-
-  // GET /api/v1/grades/:id — Get single grade entry
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.gradesService.findOne(+id);
-  }
 
   // PUT /api/v1/grades/:id — Update or correct a grade entry
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateGradeDto: UpdateGradeDto) {
     return this.gradesService.update(+id, updateGradeDto);
   }

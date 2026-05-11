@@ -27,7 +27,7 @@ export class UsersController {
 
     // POST /api/v1/users — admin only
     @UseGuards(RolesGuard)
-    @Roles('admin', 'headteacher')
+    @Roles('admin')
     @Post()
     create(@Body() createUserDto: CreateUserDto) {
         return this.usersService.create(createUserDto);
@@ -73,7 +73,7 @@ export class UsersController {
 
     // POST /api/v1/users/:id/subjects — admin only
     @UseGuards(RolesGuard)
-    @Roles('admin', 'headteacher')
+    @Roles('admin')
     @Post(':id/subjects')
     assignSubjects(@Param('id', ParseIntPipe) id: number, @Body() body: { subjectIds: number[] }) {
         return this.usersService.assignSubjects(id, body.subjectIds);
@@ -81,7 +81,7 @@ export class UsersController {
 
     // PUT /api/v1/users/:id/class — admin only
     @UseGuards(RolesGuard)
-    @Roles('admin', 'headteacher')
+    @Roles('admin')
     @Put(':id/class')
     assignClass(@Param('id', ParseIntPipe) id: number, @Body() body: { classId: number }) {
         return this.usersService.assignClass(id, body.classId);

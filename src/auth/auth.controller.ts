@@ -20,11 +20,7 @@ import { AuthLoginDto } from './dto/auth.dto';
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
 
-    @Post('register')
-    @ApiOperation({ summary: 'Register a new user account' })
-    async register(@Body() body: { firstName: string; LastName: string; email: string; password: string; role?: string }) {
-        return this.authService.register(body);
-    }
+
 
     @Post('login')
     @ApiOperation({ summary: 'Login with username and password, returns JWT token' })
