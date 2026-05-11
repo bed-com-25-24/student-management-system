@@ -10,7 +10,7 @@ export class GradesService {
   constructor(
     @InjectRepository(Grade)
     private readonly gradesRepository: Repository<Grade>,
-  ) {}
+  ) { }
 
   async create(createGradeDto: CreateGradeDto): Promise<Grade> {
     const grade = this.gradesRepository.create(createGradeDto);
@@ -38,9 +38,21 @@ export class GradesService {
 
     return await this.gradesRepository.save(updated);
   }
+
+  async remove(id: number): Promise<{ message: string }> {
+    await this.findOne(id); // ensures 404 if not found
+    await this.gradesRepository.delete(id);
+    return { message: `Grade ${id} deleted successfully` };
+  }
+
   async findByStudentAndSubject(studentId: number, subjectId: number, term?: string): Promise<Grade> {
+    const whereCondition: any = { studentId, subjectId };
+    if (term) {
+      whereCondition.term = term;
+    }
+
     const grade = await this.gradesRepository.findOne({
-      where: term ? { studentId, subjectId, term } : { studentId, subjectId },
+      where: whereCondition,
     });
     if (!grade) {
       throw new NotFoundException(`Grade for student ${studentId} in subject ${subjectId} not found`);
@@ -56,7 +68,9 @@ export class GradesService {
 
 
   async computeFinalGrade(studentId: number, term: string): Promise<number> {
-    const grades = await this.gradesRepository.find({ where: { studentId, term } });
+    const grades = await this.gradesRepository.find({
+      where: { studentId, term: Number(term) }
+    });
     if (!grades.length) return 0;
 
     const avg = grades.reduce((sum, g) => sum + g.score, 0) / grades.length;

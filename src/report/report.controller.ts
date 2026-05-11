@@ -1,42 +1,37 @@
-import { Body, Controller, Get, Param, Post, Query, ParseIntPipe } from '@nestjs/common';
+// report.controller.ts
+import { Controller, Get, Post, Body, Param, Put, Delete, ParseIntPipe } from '@nestjs/common';
 import { ReportService } from './report.service';
 import { CreateReportDto } from './dto/create-report.dto';
-import { GenerateBatchReportDto } from './dto/generate-report.dto';
+import { UpdateReportDto } from './dto/update-report.dto';
 
-@Controller('api/v1/reports')
+@Controller('reports')
 export class ReportController {
   constructor(private readonly reportService: ReportService) { }
 
-  // Endpoint 1: POST /api/v1/reports/generate
+  // POST /reports/generate
   @Post('generate')
-  async generateReport(@Body() generateBatchDto: GenerateBatchReportDto) {
-    return this.reportService.generateReport(generateBatchDto);
+  generate(@Body() createReportDto: CreateReportDto) {
+    return this.reportService.generate(createReportDto);
   }
 
-  // Endpoint 2: GET /api/v1/reports/student/:id
+  // GET /reports/student/:id
   @Get('student/:id')
-  async getStudentReport(
-    @Param('id', ParseIntPipe) studentId: number,
-    @Query('term') term: string
-  ) {
-    return this.reportService.getStudentReport(studentId, term);
+  getStudentReports(@Param('id', ParseIntPipe) id: number) {
+    return this.reportService.findByStudent(id);
   }
 
-  // Endpoint 3: GET /api/v1/reports/class/:class
+  // GET /reports/class/:class
   @Get('class/:class')
-  async getClassReport(
-    @Param('class', ParseIntPipe) classId: number,
-    @Query('term') term: string
-  ) {
-    return this.reportService.getClassReport(classId, term);
+  getClassReports(@Param('class') className: string) {
+    return this.reportService.findByClass(className);
   }
 
-  // Endpoint 4: GET /api/v1/reports/class/:class/overview
+  // GET /reports/class/:class/overview
   @Get('class/:class/overview')
-  async getClassOverview(
-    @Param('class', ParseIntPipe) classId: number,
-    @Query('term') term: string
-  ) {
-    return this.reportService.getClassOverview(classId, term);
+  getClassOverview(@Param('class') className: string) {
+    return this.reportService.getClassOverview(className);
   }
+
+
 }
+

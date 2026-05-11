@@ -1,22 +1,28 @@
-import{Entity,PrimaryGeneratedColumn,Column,CreateDateColumn,UpdateDateColumn} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
+
 @Entity('grades')
-export class Grade{
+export class Grade {
     @PrimaryGeneratedColumn()
-    id!:number;
-    @Column()
-    classId! :number;
-    @Column()
-    studentId! :number;
-    @Column()
-    subjectId! :number;
-    @Column({ type: 'varchar',length :20})
-    term!:string;
+    id!: number;
+
+    @Column({ type: 'number' })
+    classId!: number;
+
+    @Column({ type: 'number' })
+    studentId!: number;
+
+    @Column({ type: 'number' })
+    subjectId!: number;
+
+    @Column({ name: 'term', type: 'number' })
+    term!: number;
+
     @Column({ type: 'decimal', precision: 5, scale: 2 })
-    score! :number;
+    score!: number;
+
     @CreateDateColumn()
-    createAt!:Date;
+    createAt!: Date;
+
     @UpdateDateColumn()
-    updateAt! :Date;
-
-
+    updateAt!: Date;
 }

@@ -1,6 +1,7 @@
 // dto/create-report.dto.ts
 import { IsNumber, IsString,  IsNotEmpty, IsOptional, IsDate, Min, Max  } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateReportDto {
   @IsNumber()
@@ -8,9 +9,10 @@ export class CreateReportDto {
   @Min(0)
   total!: number;
 
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  term!: string;
+  @ApiProperty()
+  term!: number;
 
   @IsNumber()
   @IsNotEmpty()
@@ -40,5 +42,6 @@ export class CreateReportDto {
 
   @IsOptional()
   @IsNumber()
+  @ApiProperty({ required: false })
   classId?: number;
 }

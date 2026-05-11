@@ -4,7 +4,7 @@ import { IsNumber, IsString, IsNotEmpty } from 'class-validator';
 export class GenerateBatchReportDto {
     @IsNumber()
     @IsNotEmpty()
-    classId!: number;
+    class!: number;
 
     @IsString()
     @IsNotEmpty()
